@@ -1,8 +1,8 @@
 {
-  "name": "tiktok-downloader-hybrid",
+  "name": "tiktok-downloader-premium",
   "version": "1.0.0",
-  "description": "Hybrid TikTok scraper + frontend for Vercel",
   "main": "api/tiktok.js",
+  "type": "commonjs",
   "scripts": {
     "start": "vercel dev"
   },
