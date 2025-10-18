@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Downloader Realtime ⚡</title>
+<style>
+body {font-family: 'Poppins', sans-serif; background: #f8f9fa; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0;}
+.container {background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 90%; max-width: 500px;}
+input {width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px;}
+button {background: #ff0050; border: none; color: white; padding: 12px; width: 100%; border-radius: 8px; margin-top: 10px; font-size: 16px; cursor: pointer;}
+button:hover {background: #e6004a;}
+video {width: 100%; margin-top: 20px; border-radius: 10px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>TikTok Downloader ⚡</h2>
+  <input type="text" id="url" placeholder="Tempel tautan TikTok di sini..." />
+  <button onclick="download()">Download Sekarang</button>
+  <div id="result"></div>
+</div>
+
+<script>
+async function download() {
+  const url = document.getElementById("url").value.trim();
+  const resultDiv = document.getElementById("result");
+  if (!url) return alert("Masukkan tautan TikTok dulu!");
+
+  resultDiv.innerHTML = "⏳ Memproses...";
+  try {
+    const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+
+    if (!data.status) return (resultDiv.innerHTML = "❌ " + data.error);
+
+    const videoUrl = data.server2?.video || data.server1?.video;
+
+    resultDiv.innerHTML = `
+      <h3>✅ Video Siap Diupload!</h3>
+      <video controls src="${videoUrl}" autoplay loop></video>
+      <p><strong>Deskripsi:</strong> ${data.server2?.desc || "Tidak ada deskripsi"}</p>
+      <a href="${videoUrl}" download>⬇️ Download Video</a>
+    `;
+  } catch (e) {
+    resultDiv.innerHTML = "❌ Gagal mengambil video TikTok!";
+  }
+}
+</script>
+</body>
+</html>
