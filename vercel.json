@@ -5,7 +5,7 @@
     { "src": "index.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/tiktok.js" },
+    { "src": "/api/tiktok", "dest": "/api/tiktok.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
