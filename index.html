@@ -1,51 +1,120 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok Downloader Realtime ⚡</title>
-<style>
-body {font-family: 'Poppins', sans-serif; background: #f8f9fa; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0;}
-.container {background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 90%; max-width: 500px;}
-input {width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px;}
-button {background: #ff0050; border: none; color: white; padding: 12px; width: 100%; border-radius: 8px; margin-top: 10px; font-size: 16px; cursor: pointer;}
-button:hover {background: #e6004a;}
-video {width: 100%; margin-top: 20px; border-radius: 10px;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Downloader</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #0d1117;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #00f5d4;
+      font-size: 2.2em;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 80%;
+      max-width: 400px;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 1em;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px 25px;
+      background: #00f5d4;
+      border: none;
+      color: #000;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .result {
+      margin-top: 25px;
+      background: #161b22;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 500px;
+      text-align: center;
+      display: none;
+    }
+    video {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    a.download {
+      display: block;
+      background: #00f5d4;
+      color: #000;
+      padding: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h2>TikTok Downloader ⚡</h2>
-  <input type="text" id="url" placeholder="Tempel tautan TikTok di sini..." />
-  <button onclick="download()">Download Sekarang</button>
-  <div id="result"></div>
-</div>
+  <h1>TikTok Downloader</h1>
+  <input id="tiktokUrl" type="text" placeholder="Paste TikTok Link Here..." />
+  <button id="downloadBtn">Download</button>
 
-<script>
-async function download() {
-  const url = document.getElementById("url").value.trim();
-  const resultDiv = document.getElementById("result");
-  if (!url) return alert("Masukkan tautan TikTok dulu!");
+  <div id="result" class="result">
+    <p id="statusText">Processing...</p>
+    <video id="preview" controls></video>
+    <a id="downloadLink" class="download" target="_blank">Download Video</a>
+  </div>
 
-  resultDiv.innerHTML = "⏳ Memproses...";
-  try {
-    const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
-    const data = await res.json();
+  <script>
+    document.getElementById("downloadBtn").addEventListener("click", async () => {
+      const url = document.getElementById("tiktokUrl").value.trim();
+      const resultBox = document.getElementById("result");
+      const preview = document.getElementById("preview");
+      const link = document.getElementById("downloadLink");
+      const statusText = document.getElementById("statusText");
 
-    if (!data.status) return (resultDiv.innerHTML = "❌ " + data.error);
+      if (!url) {
+        alert("Please enter a TikTok link!");
+        return;
+      }
 
-    const videoUrl = data.server2?.video || data.server1?.video;
+      resultBox.style.display = "block";
+      statusText.textContent = "Fetching video...";
 
-    resultDiv.innerHTML = `
-      <h3>✅ Video Siap Diupload!</h3>
-      <video controls src="${videoUrl}" autoplay loop></video>
-      <p><strong>Deskripsi:</strong> ${data.server2?.desc || "Tidak ada deskripsi"}</p>
-      <a href="${videoUrl}" download>⬇️ Download Video</a>
-    `;
-  } catch (e) {
-    resultDiv.innerHTML = "❌ Gagal mengambil video TikTok!";
-  }
-}
-</script>
+      try {
+        const response = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+
+        if (!data.status) {
+          statusText.textContent = "❌ Failed to process TikTok URL!";
+          return;
+        }
+
+        const videoUrl = data.server1?.video || data.server2?.url;
+        if (videoUrl) {
+          preview.src = videoUrl;
+          link.href = videoUrl;
+          link.textContent = "⬇ Download Now";
+          statusText.textContent = "✅ Video Ready!";
+        } else {
+          statusText.textContent = "❌ Video not found!";
+        }
+      } catch (err) {
+        statusText.textContent = "⚠️ Error: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
